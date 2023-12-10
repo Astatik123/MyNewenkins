@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cute Website</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            text-align: center;
+            margin: 50px;
+        }
+
+        h1 {
+            color: #3498db;
+        }
+
+        p {
+            color: #333;
+        }
+
+        .cute-image {
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Cute Website!</h1>
+    <img class="cute-image" src="cute-image.jpg" alt="Cute Image">
+    <p>This is a simple and cute website. Enjoy your stay!</p>
+</body>
+</html>
