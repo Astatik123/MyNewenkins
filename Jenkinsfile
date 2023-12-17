@@ -14,10 +14,7 @@ pipeline {
         }
         stage('ShellBush') {
             steps {
-                sh
-                '''
-                bash run.sh
-                '''
+                sh '''bash run.sh'''
             }
         }
     }
