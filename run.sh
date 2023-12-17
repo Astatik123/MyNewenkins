@@ -1,0 +1,2 @@
+ip a
+echo 'HelloWorld'
