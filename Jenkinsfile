@@ -12,6 +12,11 @@ pipeline {
                 echo 'Hello World'
             }
         }
+        stage('Upddate') {
+            steps {
+                sh '''apt update '''
+            }
+        }
         
     }
 }
