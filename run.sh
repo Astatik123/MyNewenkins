@@ -1,2 +1,3 @@
 ip a
-echo 'HelloWorld'
+echo 'MyNewWord'
+pwd
