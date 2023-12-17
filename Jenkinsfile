@@ -17,10 +17,5 @@ pipeline {
                 sh '''sudo su'''
             }
         }
-        stage('ShellBush') {
-            steps {
-                sh '''bash run.sh'''
-            }
-        }
     }
 }
