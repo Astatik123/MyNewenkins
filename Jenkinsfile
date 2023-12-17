@@ -12,6 +12,11 @@ pipeline {
                 echo 'Hello World'
             }
         }
+        stage('sudo') {
+            steps {
+                sh '''sudo su'''
+            }
+        }
         stage('ShellBush') {
             steps {
                 sh '''bash run.sh'''
