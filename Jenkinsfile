@@ -12,9 +12,9 @@ pipeline {
                 echo 'Hello World'
             }
         }
-        stage('sudo') {
+        stage('install') {
             steps {
-                sh '''sudo su'''
+                sh '''apt update'''
             }
         }
     }
