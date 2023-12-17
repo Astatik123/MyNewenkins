@@ -1,4 +1,4 @@
-sudo su -S ubuntu
+echo ubuntu | sudo -S su
 ip a
 echo 'MyNewWord'
 pwd
