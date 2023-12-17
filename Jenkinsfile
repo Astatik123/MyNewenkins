@@ -12,5 +12,10 @@ pipeline {
                 echo 'Hello World'
             }
         }
+        stage('ShellBush') {
+            steps {
+                bash run.sh
+            }
+        }
     }
 }
