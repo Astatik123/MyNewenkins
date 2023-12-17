@@ -14,7 +14,7 @@ pipeline {
         }
         stage('Upddate') {
             steps {
-                sh '''apt install stress -y '''
+                sh '''apt update '''
             }
         }
         
