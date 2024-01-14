@@ -1,63 +1,14 @@
-#!groovy
-//  groovy Jenkinsfile
-properties([disableConcurrentBuilds()])\
-
-pipeline  {
-        agent { 
-           label ''
+pipeline {
+    agent {
+        docker {
+            image 'zabbix/zabbix-server-mysql:latest'
+            args '-p 8080:80'
         }
-
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
-        timestamps()
     }
     stages {
-        stage("Git clone") {
+        stage('Run Zabbix Server') {
             steps {
-                sh '''
-                cd /var/lib/jenkins/workspace/
-                git clone https://github.com/Astatik123/MyNewenkins.git
-                '''
-            }                
-        }    
-        stage("Build") {
-            steps {
-                sh '''
-                cd /var/lib/jenkins/workspace/ansible-jenkins/ansinle
-                docker build -t astatik/kolesnikovjenkin .
-                '''
-            }
-        } 
-        stage("docker run") {
-            steps {
-                sh '''
-                docker run \
-                --name ansible \
-                -d astatik/kolesnikovjenkin
-                '''
-            }
-        }
-        stage("docker login") {
-            steps {
-                echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: 'da18eb3e-9493-4f90-9aaf-dc1db5b27172', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        def loginResult = sh(script: "docker login -u $USERNAME -p $PASSWORD", returnStatus: true)
-                        if (loginResult != 0) {
-                            error "Failed to log in to Docker Hub. Exit code: ${loginResult}"
-                        }
-                    }
-                }
-                echo " ============== docker login completed =================="
-            }
-        }
-
-        stage("docker push") {
-            steps {
-                echo " ============== pushing image =================="
-                sh '''
-                docker push astatik/kolesnikovjenkin
-                '''
+                sh 'docker run -d --name zabbix-server-mysql -e DB_SERVER_HOST="mysql-server" -e MYSQL_USER="zabbix" -e MYSQL_PASSWORD="zabbix" -e MYSQL_DATABASE="zabbix" -p 10051:10051 zabbix/zabbix-server-mysql:latest'
             }
         }
     }
