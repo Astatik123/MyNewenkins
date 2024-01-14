@@ -16,7 +16,6 @@ pipeline  {
             steps {
                 sh '''
                 cd /var/lib/jenkins/workspace/
-                rm -rf ansible-jenkins
                 git clone https://github.com/Astatik123/MyNewenkins.git
                 '''
             }                
