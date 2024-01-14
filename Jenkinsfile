@@ -90,7 +90,7 @@ pipeline  {
         stage("docker login") {
             steps {
                 echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: 'ca996010-d223-4789-be46-bdb337cf2615', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'Docker/******', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     script {
                         def loginResult = sh(script: "docker login -u $USERNAME -p $PASSWORD", returnStatus: true)
                         if (loginResult != 0) {
