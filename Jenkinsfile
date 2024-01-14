@@ -30,7 +30,7 @@ pipeline  {
           stage("Postgresql") {
             steps {
                 sh '''
-                sudo docker run -d \
+                docker run -d \
                 --name zabbix-postgres \
                 --network zabbix-net \
                 -v /var/lib/zabbix/timezone:/etc/timezone \
@@ -45,7 +45,7 @@ pipeline  {
         stage("Zabbix server") {
             steps {
                 sh '''
-                sudo docker run \
+                docker run \
                 --name zabbix-server \
                 --network zabbix-net \
                 -v /var/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts \
@@ -61,7 +61,7 @@ pipeline  {
         stage("Zabbix web server") {
             steps {
                 sh '''
-                sudo docker run \
+                docker run \
                 --name zabbix-web \
                 -p 80:8080 -p 443:8443 \
                 --network zabbix-net \
@@ -79,9 +79,9 @@ pipeline  {
         stage("run") {
             steps {
                 sh '''
-                sudo docker start zabbix-postgres
-                sudo docker start zabbix-server
-                sudo docker start zabbix-web
+                docker start zabbix-postgres
+                docker start zabbix-server
+                docker start zabbix-web
                 '''
             }
         }
