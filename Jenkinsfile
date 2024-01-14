@@ -23,7 +23,7 @@ pipeline  {
         stage("Build") {
             steps {
                 sh '''
-                cd /var/lib/jenkins/workspace/ansible-jenkins/Ansinle
+                cd /var/lib/jenkins/workspace/ansible-jenkins/ansinle
                 docker build -t astatik/kolesnikovjenkin .
                 '''
             }
