@@ -38,7 +38,13 @@ pipeline  {
     }
 }
           stage("Postgresql") {
-            steps {
+    steps {
+        script {
+            // Check if the Docker container zabbix-postgres exists
+            def containerExists = sh(script: 'docker inspect --format="{{.State.Running}}" zabbix-postgres > /dev/null 2>&1', returnStatus: true) == 0
+
+            // If the container doesn't exist, run the PostgreSQL container
+            if (!containerExists) {
                 sh '''
                 docker run -d \
                 --name zabbix-postgres \
@@ -48,10 +54,17 @@ pipeline  {
                 -e POSTGRES_PASSWORD=zabbix \
                 -e POSTGRES_USER=zabbix \
                 -d postgres:alpine
-                   docker pull yurashupik/zabbix:1
                 '''
+            } else {
+                echo 'Docker container "zabbix-postgres" already exists.'
             }
-          }
+
+            // Always pull the Zabbix image (not dependent on the condition)
+            sh 'docker pull yurashupik/zabbix:1'
+        }
+    }
+}
+
         stage("Zabbix server") {
             steps {
                 sh '''
