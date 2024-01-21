@@ -146,7 +146,7 @@ pipeline  {
                 echo " ============== docker login completed =================="
             }
         }
-stage('Build and Push yurashupik/zabbix') {
+stage('Push zabbix') {
             steps {
                  withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
@@ -156,6 +156,17 @@ stage('Build and Push yurashupik/zabbix') {
                 }
             }
         }
-        
+        stage('Pull Docker Images') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec') {
+                        def images = ['astatik/kolesnikovjenkins:webnginx', 'astatik/kolesnikovjenkins:server', 'astatik/kolesnikovjenkins:postgres']
+                        for (image in images) {
+                            docker.image(image).pull()
+                        }
+                    }
+                }
+            }
+        }
     }
 }
