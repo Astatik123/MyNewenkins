@@ -66,7 +66,13 @@ pipeline  {
 }
 
         stage("Zabbix server") {
-            steps {
+    steps {
+        script {
+            // Check if the Docker container zabbix-server exists
+            def containerExists = sh(script: 'docker inspect --format="{{.State.Running}}" zabbix-server > /dev/null 2>&1', returnStatus: true) == 0
+
+            // If the container doesn't exist, run the Zabbix server container
+            if (!containerExists) {
                 sh '''
                 docker run \
                 --name zabbix-server \
@@ -79,10 +85,21 @@ pipeline  {
                 -e POSTGRES_PASSWORD="zabbix" \
                 -d zabbix/zabbix-server-pgsql:alpine-latest
                 '''
+            } else {
+                echo 'Docker container "zabbix-server" already exists.'
             }
         }
+    }
+}
+
         stage("Zabbix web server") {
-            steps {
+    steps {
+        script {
+            // Check if the Docker container zabbix-web exists
+            def containerExists = sh(script: 'docker inspect --format="{{.State.Running}}" zabbix-web > /dev/null 2>&1', returnStatus: true) == 0
+
+            // If the container doesn't exist, run the Zabbix web server container
+            if (!containerExists) {
                 sh '''
                 docker run \
                 --name zabbix-web \
@@ -97,8 +114,13 @@ pipeline  {
                 -e PHP_TZ="Europe/Kiev" \
                 -d zabbix/zabbix-web-nginx-pgsql:alpine-latest
                 '''
+            } else {
+                echo 'Docker container "zabbix-web" already exists.'
             }
         }
+    }
+}
+
         stage("run") {
             steps {
                 sh '''
