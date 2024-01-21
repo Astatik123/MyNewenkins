@@ -144,8 +144,9 @@ stage('Push zabbix') {
             steps {
                  withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    sh 'docker push astatik/kolesnikovjenkins:webnginx'
-                    sh 'docker push astatik/kolesnikovjenkins:server'
+                    sh 'docker push astatik/kolesnikovjenkins:1'
+                    sh 'docker push astatik/kolesnikovjenkins:2'
+                         sh 'docker push astatik/kolesnikovjenkins:3'
                          
                 }
             }
@@ -154,124 +155,14 @@ stage('Push zabbix') {
             steps {
                   withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                        sh 'docker pull astatik/kolesnikovjenkins:webnginx '
-                    sh 'docker pull astatik/kolesnikovjenkins:server '
-                    sh 'docker pull astatik/kolesnikovjenkins:postgres'  
+                        sh 'docker pull astatik/kolesnikovjenkins:1 '
+                    sh 'docker pull astatik/kolesnikovjenkins:2'
+                    sh 'docker pull astatik/kolesnikovjenkins:3'  
                         }
                     }
                 }
 
-                stage("Newnetwork") {
-    steps {
-        script {
-            // Check if the Docker network exists
-            def networkExists = sh(script: 'docker network inspect zabbix-net > /dev/null 2>&1', returnStatus: true) == 0
-
-            // If the network doesn't exist, create it
-            if (!networkExists) {
-                sh '''
-                docker network create zabbix-newnet            
-                '''
-            } else {
-                echo 'Docker network "zabbix-net" already exists.'
-            }
-        }
-    }
-}
-          stage("Postgresqlnew") {
-    steps {
-        script {
-            // Check if the Docker container zabbix-postgres exists
-            def containerExists = sh(script: 'docker inspect --format="{{.State.Running}}" zabbix-postgres > /dev/null 2>&1', returnStatus: true) == 0
-
-            // If the container doesn't exist, run the PostgreSQL container
-            if (!containerExists) {
-                sh '''
-                docker run -d \
-                --name zabbix-newpostgres \
-                --network zabbix-newnet \
-                -v /var/lib/zabbix/timezone:/etc/timezone \
-                -v /var/lib/zabbix/localtime:/etc/localtime \
-                -e POSTGRES_PASSWORD=zabbix \
-                -e POSTGRES_USER=zabbix \
-                -d astatik/kolesnikovjenkins:postgres
-                '''
-            } else {
-                echo 'Docker container "zabbix-postgres" already exists.'
-            }
-
-            // Always pull the Zabbix image (not dependent on the condition)
-            sh 'docker pull yurashupik/zabbix:1'
-        }
-    }
-}
-
-        stage("Zabbixnew server") {
-    steps {
-        script {
-            // Check if the Docker container zabbix-server exists
-            def containerExists = sh(script: 'docker inspect --format="{{.State.Running}}" zabbix-server > /dev/null 2>&1', returnStatus: true) == 0
-
-            // If the container doesn't exist, run the Zabbix server container
-            if (!containerExists) {
-                sh '''
-                docker run \
-                --name zabbix-newserver \
-                --network zabbix-newnet \
-                -v /var/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts \
-                -v /var/lib/zabbix/timezone:/etc/timezone \
-                -v /var/lib/zabbix/localtime:/etc/localtime \
-                -p 10051:10051 -e DB_SERVER_HOST="zabbix-postgres" \
-                -e POSTGRES_USER="zabbix" \
-                -e POSTGRES_PASSWORD="zabbix" \
-                -d astatik/kolesnikovjenkins:server
-                '''
-            } else {
-                echo 'Docker container "zabbix-server" already exists.'
-            }
-        }
-    }
-}
-
-        stage("Zabbix web newserver") {
-    steps {
-        script {
-            // Check if the Docker container zabbix-web exists
-            def containerExists = sh(script: 'docker inspect --format="{{.State.Running}}" zabbix-web > /dev/null 2>&1', returnStatus: true) == 0
-
-            // If the container doesn't exist, run the Zabbix web server container
-            if (!containerExists) {
-                sh '''
-                docker run \
-                --name zabbix-newweb \
-                -p 80:8888 -p 443:8443 \
-                --network zabbix-newnet \
-                -e DB_SERVER_HOST="zabbix-newpostgres" \
-                -v /var/lib/zabbix/timezone:/etc/timezone \
-                -v /var/lib/zabbix/localtime:/etc/localtime \
-                -e POSTGRES_USER="zabbix" \
-                -e POSTGRES_PASSWORD="zabbix" \
-                -e ZBX_SERVER_HOST="zabbix-newserver" \
-                -e PHP_TZ="Europe/Kiev" \
-                -d astatik/kolesnikovjenkins:webnginx
-                '''
-            } else {
-                echo 'Docker container "zabbix-web" already exists.'
-            }
-        }
-    }
-}
-
-        stage("Newrun") {
-            steps {
-                sh '''
-                docker start zabbix-newpostgres
-                docker start zabbix-newserver
-                docker start zabbix-newweb
-                '''
-            }
-        }
-            
+               
 
     }
 }
