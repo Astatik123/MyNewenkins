@@ -210,9 +210,7 @@ stage('Push zabbix') {
   -d \
   astatik/kolesnikovjenkins:webnginx
                 '''
-            } else {
-                echo 'Docker container "zabbix-server" already exists.'
-            }
+            
         }
     }
 }
