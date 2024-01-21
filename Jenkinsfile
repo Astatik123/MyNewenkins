@@ -275,4 +275,4 @@ stage('Push zabbix') {
 
     }
 }
-}
+
