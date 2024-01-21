@@ -168,6 +168,53 @@ stage('Push zabbix') {
                     }
                 }
             }
-        
+                stage("Zabbix server") {
+    steps {
+        script {
+            
+                sh '''
+                docker network create newzabbixnet
+                docker run \
+  --name zabbix-postgres1 \
+  --network newzabbixnet \
+  -e POSTGRES_DB=zabbix \
+  -e POSTGRES_USER=zabbix \
+  -e POSTGRES_PASSWORD=my_password \
+  -d \
+  astatik/kolesnikovjenkins:postgres
+  docker run \
+  --name zabbix-server1 \
+  --network newzabbixnet \
+  -e DB_SERVER_HOST=zabbix-postgres1 \
+  -e DB_SERVER_PORT=5432 \
+  -e POSTGRES_DB=zabbix \
+  -e POSTGRES_USER=zabbix \
+  -e POSTGRES_PASSWORD=my_password \
+  -e ZBX_SERVER_HOST=zabbix-server \
+  -e ZBX_SERVER_PORT=10051 \
+  -p 10051:10051 \
+  -d \
+  astatik/kolesnikovjenkins:server
+  docker run \
+  --name zabbix-web1 \
+  --network newzabbixnet \
+  -e DB_SERVER_HOST=zabbix-postgres1 \
+  -e DB_SERVER_PORT=5432 \
+  -e POSTGRES_DB=zabbix \
+  -e POSTGRES_USER=zabbix \
+  -e POSTGRES_PASSWORD=my_password \
+  -e ZBX_SERVER_HOST=zabbix-server1 \
+  -e ZBX_SERVER_PORT=10051 \
+  -e PHP_TZ=UTC \
+  -p 8888:8080 \
+  -d \
+  astatik/kolesnikovjenkins:webnginx
+                '''
+            } else {
+                echo 'Docker container "zabbix-server" already exists.'
+            }
+        }
+    }
+}
     }
 }
