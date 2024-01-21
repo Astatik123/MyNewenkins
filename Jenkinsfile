@@ -146,28 +146,14 @@ pipeline  {
                 echo " ============== docker login completed =================="
             }
         }
-
-        stage("Build and Push Docker Image") {
+stage('Build and Push yurashupik/zabbix') {
             steps {
-                script {
-                    // Build and push Docker image to Docker Hub
-                    docker.build("astatik/myzabbix:latest")
-                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
-                        docker.image("astatik/myzabbix:latest").push()
-                    }
+                 withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh 'docker push yurashupik/zabbix:latest'
                 }
             }
         }
-
-        stage("Pull Docker Image") {
-            steps {
-                script {
-                    // Pull Docker image from Docker Hub
-                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
-                        docker.image("astatik/myzabbix:latest").pull()
-                    }
-                }
-            }
-        }
+        
     }
 }
