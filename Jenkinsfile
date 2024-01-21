@@ -52,9 +52,6 @@ pipeline  {
             } else {
                 echo 'Docker container "zabbix-postgres" already exists.'
             }
-
-            // Always pull the Zabbix image (not dependent on the condition)
-            sh 'docker pull yurashupik/zabbix:1'
         }
     }
 }
