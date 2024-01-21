@@ -1,0 +1,53 @@
+pipeline {
+    agent {
+        label ''
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
+        timestamps()
+    }
+
+    stages {
+        stage("Checkout") {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage("Build and Push Docker Image") {
+            steps {
+                script {
+                    // Build and push Docker image to Docker Hub
+                    docker.build("astatik/zabbix:latest")
+                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
+                        docker.image("astatik/zabbix:latest").push()
+                    }
+                }
+            }
+        }
+
+        stage("Pull Docker Image") {
+            steps {
+                script {
+                    // Pull Docker image from Docker Hub
+                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
+                        docker.image("astatik/zabbix:latest").pull()
+                    }
+                }
+            }
+        }
+
+        // ... (Previous stages remain the same)
+
+        stage("run") {
+            steps {
+                sh '''
+                    docker start zabbix-postgres
+                    docker start zabbix-server
+                    docker start zabbix-web
+                '''
+            }
+        }
+    }
+}
