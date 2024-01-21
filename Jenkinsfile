@@ -97,7 +97,7 @@ pipeline  {
                 sh '''
                 docker run \
                 --name zabbix-web \
-                -p 80:8081 -p 443:8443 \
+                -p 80:5555 -p 443:8443 \
                 --network zabbix-net \
                 -e DB_SERVER_HOST="zabbix-postgres" \
                 -v /var/lib/zabbix/timezone:/etc/timezone \
