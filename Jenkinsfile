@@ -85,13 +85,7 @@ pipeline  {
                 '''
             }
         }
-    stages {
-        stage("Checkout") {
-            steps {
-                checkout scm
-            }
-        }
-
+    
                     
         stage("docker login") {
             steps {
