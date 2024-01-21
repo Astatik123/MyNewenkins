@@ -159,7 +159,8 @@ stage('Push zabbix') {
         stage('Pull Docker Images') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec') {
+                    withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                         sh 'docker pull astatik/kolesnikovjenkins:webnginx '
                     sh 'docker pull astatik/kolesnikovjenkins:server '
                     sh 'docker pull astatik/kolesnikovjenkins:postgres '  
