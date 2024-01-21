@@ -85,7 +85,35 @@ pipeline  {
                 '''
             }
         }
-    
+    stages {
+        stage("Checkout") {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage("Build and Push Docker Image") {
+            steps {
+                script {
+                    // Build and push Docker image to Docker Hub
+                    docker.build("astatik/myzabbix:latest")
+                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
+                        docker.image("astatik/myzabbix:latest").push()
+                    }
+                }
+            }
+        }
+
+        stage("Pull Docker Image") {
+            steps {
+                script {
+                    // Pull Docker image from Docker Hub
+                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
+                        docker.image("astatik/myzabbix:latest").pull()
+                    }
+                }
+            }
+        }
                 
         stage("docker login") {
             steps {
