@@ -146,7 +146,7 @@ stage('Push zabbix') {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     sh 'docker push astatik/kolesnikovjenkins:webnginx'
                     sh 'docker push astatik/kolesnikovjenkins:server'
-                    sh 'docker push astatik/kolesnikovjenkins:postgres'     
+                         
                 }
             }
         }
