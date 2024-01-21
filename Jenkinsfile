@@ -163,7 +163,7 @@ stage('Push zabbix') {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                         sh 'docker pull astatik/kolesnikovjenkins:webnginx '
                     sh 'docker pull astatik/kolesnikovjenkins:server '
-                    sh 'docker pull astatik/kolesnikovjenkins:postgres '  
+                    sh 'docker pull astatik/kolesnikovjenkins:postgres'  
                         }
                     }
                 }
