@@ -272,7 +272,7 @@ stage('Push zabbix') {
                 '''
             }
         }
-            }
+            
 
     }
 }
