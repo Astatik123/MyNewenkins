@@ -21,12 +21,22 @@ pipeline  {
             } 
         }
         stage("network") {
-            steps {
+    steps {
+        script {
+            // Check if the Docker network exists
+            def networkExists = sh(script: 'docker network inspect zabbix-net > /dev/null 2>&1', returnStatus: true) == 0
+
+            // If the network doesn't exist, create it
+            if (!networkExists) {
                 sh '''
                 docker network create zabbix-net            
                 '''
+            } else {
+                echo 'Docker network "zabbix-net" already exists.'
             }
         }
+    }
+}
           stage("Postgresql") {
             steps {
                 sh '''
