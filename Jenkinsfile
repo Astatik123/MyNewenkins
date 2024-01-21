@@ -150,7 +150,7 @@ stage('Build and Push yurashupik/zabbix') {
             steps {
                  withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    sh 'docker push yurashupik/zabbix:latest'
+                    sh 'docker push yurashupik/zabbix:1'
                 }
             }
         }
