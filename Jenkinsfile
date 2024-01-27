@@ -12,9 +12,63 @@ pipeline  {
         timestamps()
     }
     stages {
+
+            stage('Pull and rename zabbix') {
+            steps {
+                 withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh 'docker pull postgres:alpine'
+                    sh 'docker pull zabbix/zabbix-server-pgsql:alpine-latest'
+                    sh 'docker pull zabbix/zabbix-web-nginx-pgsql:alpine-latest'
+                    sh 'docker tag postgres:alpine astatik/kolesnikovjenkins:1'
+                    sh 'docker tag zabbix/zabbix-server-pgsql:alpine-latest astatik/kolesnikovjenkins:2'
+                    sh 'docker tag zabbix/zabbix-web-nginx-pgsql:alpine-latest astatik/kolesnikovjenkins:3'
+                         
+                }
+            }
+        }
+            
        
         
-        stage("network") {
+        
+    
+                    
+        stage("docker login") {
+            steps {
+                echo " ============== docker login =================="
+                withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    script {
+                        def loginResult = sh(script: "docker login -u $USERNAME -p $PASSWORD", returnStatus: true)
+                        if (loginResult != 0) {
+                            error "Failed to log in to Docker Hub. Exit code: ${loginResult}"
+                        }
+                    }
+                }
+                echo " ============== docker login completed =================="
+            }
+        }
+stage('Push zabbix') {
+            steps {
+                 withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh 'docker push astatik/kolesnikovjenkins:1'
+                    sh 'docker push astatik/kolesnikovjenkins:2'
+                    sh 'docker push astatik/kolesnikovjenkins:3'
+                         
+                }
+            }
+        }
+        stage('Pull Docker Images') {
+            steps {
+                  withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                 sh 'docker pull astatik/kolesnikovjenkins:1 '
+                    sh 'docker pull astatik/kolesnikovjenkins:2'
+                    sh 'docker pull astatik/kolesnikovjenkins:3'  
+                        }
+                    }
+                }
+stage("network") {
     steps {
         script {
             // Check if the Docker network exists
@@ -47,7 +101,7 @@ pipeline  {
                 -v /var/lib/zabbix/localtime:/etc/localtime \
                 -e POSTGRES_PASSWORD=zabbix \
                 -e POSTGRES_USER=zabbix \
-                -d postgres:alpine
+                -d astatik/kolesnikovjenkins:1
                 '''
             } else {
                 echo 'Docker container "zabbix-postgres" already exists.'
@@ -74,7 +128,7 @@ pipeline  {
                 -p 10051:10051 -e DB_SERVER_HOST="zabbix-postgres" \
                 -e POSTGRES_USER="zabbix" \
                 -e POSTGRES_PASSWORD="zabbix" \
-                -d zabbix/zabbix-server-pgsql:alpine-latest
+                -d astatik/kolesnikovjenkins:2
                 '''
             } else {
                 echo 'Docker container "zabbix-server" already exists.'
@@ -103,7 +157,7 @@ pipeline  {
                 -e POSTGRES_PASSWORD="zabbix" \
                 -e ZBX_SERVER_HOST="zabbix-server" \
                 -e PHP_TZ="Europe/Kiev" \
-                -d zabbix/zabbix-web-nginx-pgsql:alpine-latest
+                -d astatik/kolesnikovjenkins:3
                 '''
             } else {
                 echo 'Docker container "zabbix-web" already exists.'
@@ -121,44 +175,6 @@ pipeline  {
                 '''
             }
         }
-    
-                    
-        stage("docker login") {
-            steps {
-                echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        def loginResult = sh(script: "docker login -u $USERNAME -p $PASSWORD", returnStatus: true)
-                        if (loginResult != 0) {
-                            error "Failed to log in to Docker Hub. Exit code: ${loginResult}"
-                        }
-                    }
-                }
-                echo " ============== docker login completed =================="
-            }
-        }
-stage('Push zabbix') {
-            steps {
-                 withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                    sh 'docker push astatik/kolesnikovjenkins:1'
-                    sh 'docker push astatik/kolesnikovjenkins:2'
-                    sh 'docker push astatik/kolesnikovjenkins:3'
-                         
-                }
-            }
-        }
-        stage('Pull Docker Images') {
-            steps {
-                  withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
-                        sh 'docker pull astatik/kolesnikovjenkins:1 '
-                    sh 'docker pull astatik/kolesnikovjenkins:2'
-                    sh 'docker pull astatik/kolesnikovjenkins:3'  
-                        }
-                    }
-                }
-
                
 
     }
