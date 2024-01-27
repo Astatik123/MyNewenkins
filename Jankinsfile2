@@ -1,130 +1,18 @@
-#!groovy
-//  groovy Jenkinsfile
-properties([disableConcurrentBuilds()])\
+docker pull postgres:alpine  
+docker pull zabbix/zabbix-server-pgsql:alpine-latest
+docker pull zabbix/zabbix-web-nginx-pgsql:alpine-latest
 
-pipeline {
-    agent {
-        label ''
-    }
-
-
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
-        timestamps()
-    }
-
-stage("base") {
+stage('Pull and rename zabbix') {
             steps {
-                sh '''
-        
-                '''
-            } 
-        }
-        stage("network") {
-            steps {
-                sh '''
-                docker network create zabbix-net            
-                '''
-            }
-        }
-          stage("Postgresql") {
-            steps {
-                sh '''
-                docker run -d \
-                --name zabbix-postgres \
-                --network zabbix-net \
-                -v /var/lib/zabbix/timezone:/etc/timezone \
-                -v /var/lib/zabbix/localtime:/etc/localtime \
-                -e POSTGRES_PASSWORD=zabbix \
-                -e POSTGRES_USER=zabbix \
-                -d postgres:alpine
-                   docker pull yurashupik/zabbix:1
-                '''
-            }
-          }
-        stage("Zabbix server") {
-            steps {
-                sh '''
-                docker run \
-                --name zabbix-server \
-                --network zabbix-net \
-                -v /var/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts \
-                -v /var/lib/zabbix/timezone:/etc/timezone \
-                -v /var/lib/zabbix/localtime:/etc/localtime \
-                -p 10051:10051 -e DB_SERVER_HOST="zabbix-postgres" \
-                -e POSTGRES_USER="zabbix" \
-                -e POSTGRES_PASSWORD="zabbix" \
-                -d zabbix/zabbix-server-pgsql:alpine-latest
-                '''
-            }
-        }
-        stage("Zabbix web server") {
-            steps {
-                sh '''
-                docker run \
-                --name zabbix-web \
-                -p 80:8081 -p 443:8443 \
-                --network zabbix-net \
-                -e DB_SERVER_HOST="zabbix-postgres" \
-                -v /var/lib/zabbix/timezone:/etc/timezone \
-                -v /var/lib/zabbix/localtime:/etc/localtime \
-                -e POSTGRES_USER="zabbix" \
-                -e POSTGRES_PASSWORD="zabbix" \
-                -e ZBX_SERVER_HOST="zabbix-server" \
-                -e PHP_TZ="Europe/Kiev" \
-                -d zabbix/zabbix-web-nginx-pgsql:alpine-latest
-                '''
-            }
-        }
-        stage("run") {
-            steps {
-                sh '''
-                docker start zabbix-postgres
-                docker start zabbix-server
-                docker start zabbix-web
-                '''
-            }
-        }
-    stages {
-        stage("Checkout") {
-            steps {
-                checkout scm
-            }
-        }
-
-        stage("Build and Push Docker Image") {
-            steps {
-                script {
-                    // Build and push Docker image to Docker Hub
-                    docker.build("astatik/myzabbix:latest")
-                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
-                        docker.image("astatik/myzabbix:latest").push()
-                    }
+                 withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                    sh 'docker pull postgres:alpine'
+                    sh 'docker pull zabbix/zabbix-server-pgsql:alpine-latest'
+                    sh 'docker pull zabbix/zabbix-web-nginx-pgsql:alpine-latest'
+                    sh 'docker tag postgres:alpine astatik/kolesnikovjenkins:1'
+                    sh 'docker tag zabbix/zabbix-server-pgsql:alpine-latest astatik/kolesnikovjenkins:2'
+                    sh 'docker tag zabbix/zabbix-web-nginx-pgsql:alpine-latest astatik/kolesnikovjenkins:3'
+                         
                 }
             }
         }
-
-        stage("Pull Docker Image") {
-            steps {
-                script {
-                    // Pull Docker image from Docker Hub
-                    docker.withRegistry('https://registry.hub.docker.com', 'Docekr') {
-                        docker.image("astatik/myzabbix:latest").pull()
-                    }
-                }
-            }
-        }
-
-        // ... (Previous stages remain the same)
-
-        stage("run") {
-            steps {
-                sh '''
-                    docker start zabbix-postgres
-                    docker start zabbix-server
-                    docker start zabbix-web
-                '''
-            }
-        }
-    }
-}
