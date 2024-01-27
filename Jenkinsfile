@@ -15,7 +15,7 @@ pipeline  {
 
             stage('Pull and rename zabbix') {
             steps {
-                 withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                 withCredentials([usernamePassword(credentialsId: 'NewCred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     sh 'docker pull postgres:alpine'
                     sh 'docker pull zabbix/zabbix-server-pgsql:alpine-latest'
@@ -36,7 +36,7 @@ pipeline  {
         stage("docker login") {
             steps {
                 echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'NewCred', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     script {
                         def loginResult = sh(script: "docker login -u $USERNAME -p $PASSWORD", returnStatus: true)
                         if (loginResult != 0) {
@@ -49,7 +49,7 @@ pipeline  {
         }
 stage('Push zabbix') {
             steps {
-                 withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                 withCredentials([usernamePassword(credentialsId: 'NewCred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                     sh 'docker push astatik/kolesnikovjenkins:1'
                     sh 'docker push astatik/kolesnikovjenkins:2'
@@ -60,7 +60,7 @@ stage('Push zabbix') {
         }
         stage('Pull Docker Images') {
             steps {
-                  withCredentials([usernamePassword(credentialsId: 'ca2d1d1d-5a0f-470f-87c0-bde659a42cec', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                  withCredentials([usernamePassword(credentialsId: 'NewCred', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
                  sh 'docker pull astatik/kolesnikovjenkins:1 '
                     sh 'docker pull astatik/kolesnikovjenkins:2'
