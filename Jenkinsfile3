@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -5,14 +6,16 @@ pipeline {
         stage('Create Buckets') {
             steps {
                 script {
-                    import boto3
+                    // Use library directive to access boto3 functions from the AWS plugin
+                    library 'aws'
 
-                    // Введіть ваші ключі AWS
+                    // Define your AWS credentials
+                    def credentials = credentials('aws-credentials-id') // Replace with your AWS credentials ID
                     def access_key_id = 'AKIAXYKJTW444PDPTXUK'
                     def secret_access_key = 'eJf6IF3xlO4hz8iaK9Js0Q//cuEfyXBWaA+tZq9t'
 
-                    // Створення клієнта S3
-                    def s3 = boto3.client('s3', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
+                    // Create S3 client with credentials
+                    def s3 = new com.amazonaws.services.s3.AmazonS3Client(accessKeyId, secretAccessKey)
 
                     // Назва першого відра
                     def bucket_name_1 = 'superNikitaBucket12323434521231'
@@ -36,10 +39,10 @@ pipeline {
                     def file_path_2 = '/home/ubuntu/newfileasdasf.txt'
 
                     // Завантаження файлу в перше відро
-                    s3.upload_file(file_path_1, bucket_name_1, 'file_1.txt')
+                    s3.putObject(Bucket=bucket_name_1, Key=file_path_1, File=file_path_1)
 
                     // Завантаження файлу в друге відро
-                    s3.upload_file(file_path_2, bucket_name_2, 'file_2.txt')
+                    s3.putObject(Bucket=bucket_name_2, Key=file_path_2, File=file_path_2)
                 }
             }
         }
