@@ -1,7 +1,4 @@
 
-import boto3
-
-
 access_key_id = 'AKIAXYKJTW444PDPTXUK'
 secret_access_key = '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'
 
