@@ -29,6 +29,20 @@
                 }
             }
         }
+ stage('Upload Files') {
+            steps {
+                script {
+                    // Замініть на ваші дані
+                    def bucket1Name = 'mykyta1994031414031994'
+                    def bucket2Name = 'mykytaspecialstyle1234567890'
+                    def localFile1 = '/home/ubuntu/newfileonpython.txt'
+                    def localFile2 = '/home/ubuntu/newfileasdasf.txt'
 
+                    // Завантаження файлів
+                    s3.upload_file(bucket1Name, localFile1)
+                    s3.upload_file(bucket2Name, localFile2)
+                }
+            }
+        }
     }
 }
