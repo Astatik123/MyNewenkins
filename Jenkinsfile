@@ -1,6 +1,7 @@
+pipeline {
     agent any
 
-    stages {
+stages {
         stage('Create Buckets') {
             steps {
                 script {
