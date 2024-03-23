@@ -1,14 +1,14 @@
-pipeline {
+    pipeline {
     agent any
 
-stages {
+    stages {
         stage('Create Buckets') {
             steps {
                 script {
                     // Замініть на ваші дані AWS
                     def awsAccessKeyId = 'AKIAXYKJTW444PDPTXUK'
                     def awsSecretAccessKey = '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'
-pipeline {
+
                     def region = 'eu-north-1'
 
                     // Створення boto3 session
