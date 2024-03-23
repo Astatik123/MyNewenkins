@@ -1,26 +1,47 @@
+    agent any
 
-access_key_id = 'AKIAXYKJTW444PDPTXUK'
-secret_access_key = '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'
+    stages {
+        stage('Create Buckets') {
+            steps {
+                script {
+                    // Замініть на ваші дані AWS
+                    def awsAccessKeyId = 'AKIAXYKJTW444PDPTXUK'
+                    def awsSecretAccessKey = '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'
+pipeline {
+                    def region = 'eu-north-1'
 
+                    // Створення boto3 session
+                    def session = boto3.session.Session(
+                        aws_access_key_id: awsAccessKeyId,
+                        aws_secret_access_key: awsSecretAccessKey,
+                        region_name: region
+                    )
 
-s3 = boto3.client('s3', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
+                    // Створення клієнта S3
+                    def s3 = session.client('s3')
 
+                    // Створення 2 відер
+                    def bucket1Name = 'mykyta1994031414031994'
+                    def bucket2Name = 'mykytaspecialstyle1234567890'
+                    s3.create_bucket(Bucket=bucket1Name)
+                    s3.create_bucket(Bucket=bucket2Name)
+                }
+            }
+        }
+        stage('Upload Files') {
+            steps {
+                script {
+                    // Замініть на ваші дані
+                    def bucket1Name = 'bucket-1-name'
+                    def bucket2Name = 'bucket-2-name'
+                    def localFile1 = '/home/ubuntu/newfileonpython.txt'
+                    def localFile2 = '/home/ubuntu/newfileasdasf.txt'
 
-bucket_name_1 = 'superNikitaBucket12323434521231'
-
-
-s3.create_bucket(Bucket=bucket_name_1)
-
-
-bucket_name_2 = 'superNikitaBucket1232343452123123423423'
-
-
-s3.create_bucket(Bucket=bucket_name_2)
-
-file_path_1 = '/home/ubuntu/newfileonpython.txt'
-file_path_2 = '/home/ubuntu/newfileasdasf.txt'
-
-
-s3.upload_file(file_path_1, bucket_name_1, 'file_1.txt')
-
-s3.upload_file(file_path_2, bucket_name_2, 'file_2.txt')
+                    // Завантаження файлів
+                    s3.upload_file(bucket1Name, localFile1)
+                    s3.upload_file(bucket2Name, localFile2)
+                }
+            }
+        }
+    }
+}
