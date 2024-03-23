@@ -33,8 +33,8 @@
             steps {
                 script {
                     // Замініть на ваші дані
-                    def bucket1Name = 'bucket-1-name'
-                    def bucket2Name = 'bucket-2-name'
+                    def bucket1Name = 'mykyta1994031414031994'
+                    def bucket2Name = 'mykytaspecialstyle1234567890'
                     def localFile1 = '/home/ubuntu/newfileonpython.txt'
                     def localFile2 = '/home/ubuntu/newfileasdasf.txt'
 
