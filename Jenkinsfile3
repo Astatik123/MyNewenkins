@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Create Buckets') {
+            steps {
+                script {
+                    import boto3
+
+                    // Введіть ваші ключі AWS
+                    def access_key_id = 'AKIAXYKJTW444PDPTXUK'
+                    def secret_access_key = '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'
+
+                    // Створення клієнта S3
+                    def s3 = boto3.client('s3', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
+
+                    // Назва першого відра
+                    def bucket_name_1 = 'superNikitaBucket12323434521231'
+
+                    // Створення першого відра
+                    s3.create_bucket(Bucket=bucket_name_1)
+
+                    // Назва другого відра
+                    def bucket_name_2 = 'superNikitaBucket231123123'
+
+                    // Створення другого відра
+                    s3.create_bucket(Bucket=bucket_name_2)
+                }
+            }
+        }
+        stage('Upload Files') {
+            steps {
+                script {
+                    // Шлях до файлів для завантаження
+                    def file_path_1 = '/home/ubuntu/newfileonpython.txt'
+                    def file_path_2 = '/home/ubuntu/newfileasdasf.txt'
+
+                    // Завантаження файлу в перше відро
+                    s3.upload_file(file_path_1, bucket_name_1, 'file_1.txt')
+
+                    // Завантаження файлу в друге відро
+                    s3.upload_file(file_path_2, bucket_name_2, 'file_2.txt')
+                }
+            }
+        }
+    }
+}
