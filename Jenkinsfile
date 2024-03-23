@@ -9,13 +9,13 @@
                     def awsAccessKeyId = 'AKIAXYKJTW444PDPTXUK'
                     def awsSecretAccessKey = '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'
 
-                    def region = 'eu-north-1'
+                  
 
                     // Створення boto3 session
                     def session = boto3.session.Session(
                         aws_access_key_id: awsAccessKeyId,
                         aws_secret_access_key: awsSecretAccessKey,
-                        region_name: region
+                       
                     )
 
                     // Створення клієнта S3
