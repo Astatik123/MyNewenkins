@@ -1,50 +1,31 @@
 
-pipeline {
-    agent any
+import boto3
 
-    stages {
-        stage('Create Buckets') {
-            steps {
-                script {
-                    // Use library directive to access boto3 functions from the AWS plugin
-                    library 'aws'
+# Введіть ваші ключі AWS
+access_key_id = 'AKIAXYKJTW444PDPTXUK'
+secret_access_key = 'eJf6IF3xlO4hz8iaK9Js0Q//cuEfyXBWaA+tZq9t'
 
-                    // Define your AWS credentials
-                    def credentials = credentials('aws-credentials-id') // Replace with your AWS credentials ID
-                    def access_key_id = 'AKIAXYKJTW444PDPTXUK'
-                    def secret_access_key = 'eJf6IF3xlO4hz8iaK9Js0Q//cuEfyXBWaA+tZq9t'
+# Створення клієнта S3
+s3 = boto3.client('s3', aws_access_key_id=access_key_id, aws_secret_access_key=secret_access_key)
 
-                    // Create S3 client with credentials
-                    def s3 = new com.amazonaws.services.s3.AmazonS3Client(accessKeyId, secretAccessKey)
+# Назва першого відра
+bucket_name_1 = 'superNikitaBucket12323434521231'
 
-                    // Назва першого відра
-                    def bucket_name_1 = 'superNikitaBucket12323434521231'
+# Створення першого відра
+s3.create_bucket(Bucket=bucket_name_1)
 
-                    // Створення першого відра
-                    s3.create_bucket(Bucket=bucket_name_1)
+# Назва другого відра
+bucket_name_2 = 'superNikitaBucket1232343452123123423423'
 
-                    // Назва другого відра
-                    def bucket_name_2 = 'superNikitaBucket231123123'
+# Створення другого відра
+s3.create_bucket(Bucket=bucket_name_2)
 
-                    // Створення другого відра
-                    s3.create_bucket(Bucket=bucket_name_2)
-                }
-            }
-        }
-        stage('Upload Files') {
-            steps {
-                script {
-                    // Шлях до файлів для завантаження
-                    def file_path_1 = '/home/ubuntu/newfileonpython.txt'
-                    def file_path_2 = '/home/ubuntu/newfileasdasf.txt'
+# Шлях до файлів для завантаження
+file_path_1 = '/home/ubuntu/newfileonpython.txt'
+file_path_2 = '/home/ubuntu/newfileasdasf.txt'
 
-                    // Завантаження файлу в перше відро
-                    s3.putObject(Bucket=bucket_name_1, Key=file_path_1, File=file_path_1)
+# Завантаження файлу в перше відро
+s3.upload_file(file_path_1, bucket_name_1, 'file_1.txt')
 
-                    // Завантаження файлу в друге відро
-                    s3.putObject(Bucket=bucket_name_2, Key=file_path_2, File=file_path_2)
-                }
-            }
-        }
-    }
-}
+# Завантаження файлу в друге відро
+s3.upload_file(file_path_2, bucket_name_2, 'file_2.txt')
